@@ -40,16 +40,22 @@ class NeedleBoy():
 
         contours, _ = cv.findContours(img_.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         new_frame = np.zeros_like(img_)
-        print(len(contours))
+        # mask = np.zeros_like(img_)
+        # cv.drawContours(mask, contours, 1, 255, cv.FILLED)
+        # print(contours[3])
+        stuff = []
         
-        #loop over all the contours and filter out the area
+        # iterate over all the contours and filter out the area
         for i, c in enumerate(contours):
             c_area = cv.contourArea(c)
+            print(i)
+            print(c_area)
             if self.min_area <= c_area <= self.max_area:
+                stuff.append(c_area)
                 mask = np.zeros_like(img_)
                 cv.drawContours(mask, contours, i, 255, cv.FILLED)
 
-            
+        print(stuff)
         cv.imshow('new', mask)
         cv.waitKey(0)
         cv.destroyAllWindows()
@@ -84,7 +90,7 @@ class NeedleBoy():
         self.closing = cv.morphologyEx(self.canny, cv.MORPH_CLOSE, kernel, iterations=2)
         #blur closing to let img find the contours
         cnt_blur = cv.medianBlur(self.closing, 9)
-        cv.imshow('mask', cnt_blur)
+        cv.imshow('contoured', cnt_blur)
         needle_area_filter = self.area_bandpass_filter(cnt_blur)
         #extend_mask calls needle_extremes which assigns the leftmost point(center)
 
