@@ -63,6 +63,20 @@ class PointFinder:
         return masked_image
 
 
+    #filters out contours based on min/max areas
+    def area_bandpass_filter(self):
+        thresh_img = self.thresh_img
+        contours, _ = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        new_frame = np.zeros_like(thresh_img)
+
+    # masks the needle
+    def needle_filter(self, image):
+        self.flag_roi_in_out = 1
+        cropped_image = self.region_of_interest(image, np.array([self.needle_vertices], np.int32))
+        self.flag_roi_in_out = 0
+        return cropped_image
+
+
     # Find point ------------------------------------------------------------
     # implements the class
 
@@ -72,7 +86,11 @@ class PointFinder:
         self.blurred_img = cv.medianBlur(self.gray_img.copy(), 9)
         # crop out edges of frame that confuse the cv
         self.cropped_img = self.region_of_interest(self.blurred_img, np.array([self.roi_vertices], np.int32))
-        cv.imshow('window', self.cropped_img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
+        self.cropped_img = self.needle_filter(self.cropped_img)
+        # make a mask to be able to find the dark spots on the frame
+        _, self.thresh_img = cv.threshold(self.cropped_img, self.thresh_1, self.thresh_u, cv.THRESH_BINARY_INV)
+        #filters contours using area(size) thresholds
+        self.filtered_mask_img = self.area_bandpass_filter()
+        self.find_point()
+        return self.center
 
