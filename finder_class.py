@@ -81,7 +81,9 @@ class CalibrationPoints:
         pt.roi_vertices = [(width/16,0), (width/16, height * 15 / 16), 
                             (width * 15 / 16, height * 15 / 16),
                             (width * 15 / 16, 0)]
+        
         pt.needle_vertices = needle_vertices
+        
 
         # init settings
         # lighting thresholds
@@ -91,6 +93,7 @@ class CalibrationPoints:
         pt.min_area = 1300
         pt.max_area = 2800
         # execute the point class
+        print('checkpoint 4')
         self.calib_point = pt.process()
         if self.calib_point == []:
             print('not found')

@@ -129,9 +129,6 @@ class NeedleBoy():
         self.needle_vertices = region_of_interest_vertices
         new_mask = self.region_of_interest(np.array([region_of_interest_vertices], np.int32))
 
-        cv.imshow('window2', new_mask)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
         return new_mask
        
     def needle_mask(self, img_):
@@ -153,7 +150,6 @@ class NeedleBoy():
         self.median_blur = cv.medianBlur(img_, 5)
         self.gray = cv.cvtColor(self.median_blur, cv.COLOR_BGR2GRAY)
         self.canny = cv.Canny(self.gray, 40, 300, apertureSize=3)
-        cv.imshow('canny', self.canny)
 
         dilation_size = 6
         dilation_type = cv.MORPH_RECT
