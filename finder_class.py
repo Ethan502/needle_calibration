@@ -93,7 +93,6 @@ class CalibrationPoints:
         pt.min_area = 1300
         pt.max_area = 2800
         # execute the point class
-        print('checkpoint 4')
         self.calib_point = pt.process()
         if self.calib_point == []:
             print('not found')

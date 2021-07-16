@@ -65,8 +65,8 @@ class NeedleBoy():
         # iterate over all the contours and filter out the area
         for i, c in enumerate(contours):
             c_area = cv.contourArea(c)
-            print(i)
-            print(c_area)
+            # print(i)
+            # print(c_area)
             if self.min_area <= c_area <= self.max_area:
                 mask = np.zeros_like(img_)
                 cv.drawContours(mask, contours, i, 255, cv.FILLED)
