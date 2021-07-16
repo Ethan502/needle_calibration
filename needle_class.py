@@ -12,11 +12,11 @@ class NeedleBoy():
         # Data members -------------------------------------------------------
         self.img = frame
         self.width = frame.shape[1]
-        self.righttippoint = [] #x,y coordinates of the farthest left point of the point of the RIGHT needle
+        self.right_tip_point = [] #x,y coordinates of the farthest left point of the point of the RIGHT needle
         self.leftmost1 = (0,0) #leftmost point of the right needle contour
         self.bottommost1 = (0,0) #bottom of the right needle contour
         self.topmost1 = (0,0) #top point of the right needle contour
-        self.lefttippoint = []
+        self.left_tip_point = []
         self.rightmost2 = (0,0)
         self.topmost2 = (0,0)
         self.bottommost2 = (0,0)
@@ -96,9 +96,9 @@ class NeedleBoy():
         #         cv.drawContours(mask, contours, i, 255, cv.FILLED)
         #         mask = cv.bitwise_and(img_.copy(), mask)
         #         new_frame = cv.bitwise_or(new_frame, mask)
-        return frame1
+        return frame1, frame2
 
-    def needle_extremes(self, _img):
+    def needle_extremes_right(self, _img):
         """finds the left, bottom, and topmost points of the rightmost contour in grayscale
         img that only has the needles in it.
 
@@ -117,7 +117,26 @@ class NeedleBoy():
             self.bottommost1 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
-    def extend_mask(self, mask):
+            cv.circle(_img, self.leftmost1, 10, (0,0,255),1)
+
+            cv.imshow('window', _img)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+
+    def needle_extremes_left(self, _img):
+        """finds the right, bottom, and top most points for the leftmost contour of the image.
+
+        Args:
+            _img ([numpy.ndarray]): [blurred b/w image of just the left contour]
+        """
+        
+        contours, _ = cv.findContours(_img.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+
+        if len(contours) > 0:
+            cnt = contours[-1]
+
+
+    def extend_mask_right(self, mask):
         """extends the mask from the needle contour already found to the edge of the image.
         This is set up for the needle coming in from the right side of the screen.
         It do be janky. Can be set up later to detect the direction the needle is in, then extend that
@@ -132,11 +151,11 @@ class NeedleBoy():
         cv.imshow('mask', mask)
         cv.waitKey(0)
         cv.destroyAllWindows()
-        self.needle_extremes(mask)
-        x_1, y_1 = self.leftmost
-        y_diff = self.leftmost[1] - self.bottommost[1]
-        x_2 = self.topmost[0]
-        y_2 = self.topmost[1] - 2 * y_diff # !JANK ALERT!
+        self.needle_extremes_right(mask)
+        x_1, y_1 = self.leftmost1
+        y_diff = self.leftmost1[1] - self.bottommost1[1]
+        x_2 = self.topmost1[0]
+        y_2 = self.topmost1[1] - 2 * y_diff # !JANK ALERT!
         slope = -(y_2 - y_1) / (x_2 - x_1)
 
         left_mid_point = self.leftmost1
@@ -186,10 +205,11 @@ class NeedleBoy():
         self.closing = cv.morphologyEx(self.canny, cv.MORPH_CLOSE, kernel, iterations=2)
         #blur closing to let img find the contours
         cnt_blur = cv.medianBlur(self.closing, 9)
-        needle_area_filter = self.area_bandpass_filter(cnt_blur)
+        mask1, mask2 = self.area_bandpass_filter(cnt_blur)
         #extend_mask calls needle_extremes which assigns the leftmost point(center)
-        newmask = self.extend_mask(needle_area_filter)
-        return newmask
+        newmask1 = self.extend_mask_right(mask1)
+        newmask2 = self.extend_mask_left(mask2)
+        return newmask1, newmask2
         
         
 
@@ -200,5 +220,5 @@ class NeedleBoy():
            self.needle_extremes finds needlepoint
  
         """
-        self.mask = self.needle_mask(self.img)
-        self.righttippoint = self.leftmost1
+        self.mask1 , self.mask2 = self.needle_mask(self.img)
+        self.right_tip_point = self.leftmost1
