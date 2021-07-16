@@ -9,5 +9,4 @@ pic = cv.imread('static/images/needle1.jpg')
 # tester = NeedleBoy(pic)
 # tester.process()
 
-tester = PointFinder(pic)
-tester.process()
+tester = NeedleBoy(pic)

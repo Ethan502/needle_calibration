@@ -12,10 +12,14 @@ class NeedleBoy():
         # Data members -------------------------------------------------------
         self.img = frame
         self.width = frame.shape[1]
-        self.point = [] #x,y coordinates of the calibration point center
-        self.leftmost = (0,0) #leftmost point of the needle contour
-        self.bottommost = (0,0) #bottom of the needle contour
-        self.topmost = (0,0) #top point of the needle contour
+        self.righttippoint = [] #x,y coordinates of the farthest left point of the point of the RIGHT needle
+        self.leftmost1 = (0,0) #leftmost point of the right needle contour
+        self.bottommost1 = (0,0) #bottom of the right needle contour
+        self.topmost1 = (0,0) #top point of the right needle contour
+        self.lefttippoint = []
+        self.rightmost2 = (0,0)
+        self.topmost2 = (0,0)
+        self.bottommost2 = (0,0)
         # area filters settings-----------------------------------------------
         self.min_area = 10000
         self.max_area = 40000
@@ -57,22 +61,42 @@ class NeedleBoy():
         """
 
         contours, _ = cv.findContours(img_.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        new_frame = np.zeros_like(img_)
-        # mask = np.zeros_like(img_)
-        # cv.drawContours(mask, contours, 1, 255, cv.FILLED)
-        # print(contours[3])
+        frame = np.zeros_like(img_)
+        needle_contours = []
         
         # iterate over all the contours and filter out the area
         for i, c in enumerate(contours):
             c_area = cv.contourArea(c)
-            # print(i)
+            # print(i) 
             # print(c_area)
             if self.min_area <= c_area <= self.max_area:
-                mask = np.zeros_like(img_)
-                cv.drawContours(mask, contours, i, 255, cv.FILLED)
-                mask = cv.bitwise_and(img_.copy(), mask)
-                new_frame = cv.bitwise_or(new_frame, mask)
-        return new_frame
+                needle_contours.append(c)
+        frame1 = np.zeros_like(img_)
+        frame2 = np.zeros_like(img_)
+        cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
+        cv.drawContours(frame2, needle_contours, 0, 255, cv.FILLED)
+
+            # mask_one = cv.bitwise_and(img_.copy(), frame1)
+            # mask1 = cv.bitwise_or(new_frame, mask_one)
+
+            # mask_two = cv.bitwise_and(img.copy(), frame2)
+            # mask2 = cv.bitwise_or()
+        print(len(needle_contours))
+        cv.imshow('right needle', frame1)
+        cv.imshow('left needle', frame2)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+
+
+
+
+        # if self.min_area <= c_area <= self.max_area:
+        #         mask = np.zeros_like(img_)
+        #         cv.drawContours(mask, contours, i, 255, cv.FILLED)
+        #         mask = cv.bitwise_and(img_.copy(), mask)
+        #         new_frame = cv.bitwise_or(new_frame, mask)
+        return frame1
 
     def needle_extremes(self, _img):
         """finds the left, bottom, and topmost points of the rightmost contour in grayscale
@@ -89,9 +113,9 @@ class NeedleBoy():
             print(cnt)
             print(cnt.shape)
             print(type(cnt))
-            self.leftmost = tuple(cnt[cnt[:,:,0].argmin()][0])
-            self.bottommost = tuple(cnt[cnt[:,:,1].argmax()][0])
-            self.topmost = tuple(cnt[cnt[:,:,1].argmin()][0])
+            self.leftmost1 = tuple(cnt[cnt[:,:,0].argmin()][0])
+            self.bottommost1 = tuple(cnt[cnt[:,:,1].argmax()][0])
+            self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
     def extend_mask(self, mask):
         """extends the mask from the needle contour already found to the edge of the image.
@@ -105,7 +129,9 @@ class NeedleBoy():
         Returns:
             (numpy.ndarray): [b/w mask for the whole needle]
         """
-
+        cv.imshow('mask', mask)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
         self.needle_extremes(mask)
         x_1, y_1 = self.leftmost
         y_diff = self.leftmost[1] - self.bottommost[1]
@@ -113,9 +139,9 @@ class NeedleBoy():
         y_2 = self.topmost[1] - 2 * y_diff # !JANK ALERT!
         slope = -(y_2 - y_1) / (x_2 - x_1)
 
-        left_mid_point = self.leftmost
-        left_top_point = (self.leftmost[0] + 5, self.leftmost[1] + y_diff)
-        left_bottom_point = (self.leftmost[0] + 5, self.bottommost[1])
+        left_mid_point = self.leftmost1
+        left_top_point = (self.leftmost1[0] + 5, self.leftmost1[1] + y_diff)
+        left_bottom_point = (self.leftmost1[0] + 5, self.bottommost1[1])
         # b = y-mx
         b_1 = left_top_point[1] - (slope * left_top_point[0])
         b_2 = left_bottom_point[1] - (slope * left_bottom_point[0])
@@ -175,4 +201,4 @@ class NeedleBoy():
  
         """
         self.mask = self.needle_mask(self.img)
-        self.point = self.leftmost
+        self.righttippoint = self.leftmost1
