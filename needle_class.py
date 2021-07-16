@@ -69,9 +69,12 @@ class NeedleBoy():
             # print(c_area)
             if self.min_area <= c_area <= self.max_area:
                 mask = np.zeros_like(img_)
-                cv.drawContours(mask, contours, i, 255, cv.FILLED)
+                cv.drawContours(mask, contours, 2, 255, cv.FILLED)
                 mask = cv.bitwise_and(img_.copy(), mask)
                 new_frame = cv.bitwise_or(new_frame, mask)
+        cv.imshow('mask1', new_frame)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
         return new_frame
 
     def needle_extremes(self, _img):
