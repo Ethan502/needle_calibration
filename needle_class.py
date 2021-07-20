@@ -119,11 +119,11 @@ class NeedleBoy():
             cv.circle(self.img, self.leftmost1, 10, (0,0,255),1)
             cv.circle(_img, self.leftmost1, 10, (0,0,255),1)
 
-            cv.imshow('right contour', _img)
-            cv.waitKey(0)
-            cv.imshow('right contour', self.img)
-            cv.waitKey(0)
-            cv.destroyAllWindows()
+            # cv.imshow('right contour', _img)
+            # cv.waitKey(0)
+            # cv.imshow('right contour', self.img)
+            # cv.waitKey(0)
+            # cv.destroyAllWindows()
 
 
     def needle_extremes_left(self, _img):
@@ -260,6 +260,9 @@ class NeedleBoy():
             dilation_type, (2 * dilation_size, 5 * dilation_size), 
             (dilation_size, dilation_size))
         self.closing = cv.morphologyEx(self.canny, cv.MORPH_CLOSE, kernel, iterations=2)
+        cv.imshow('closing', self.closing)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
         #blur closing to let img find the contours
         cnt_blur = cv.medianBlur(self.closing, 9)
         mask1, mask2 = self.area_bandpass_filter(cnt_blur)
