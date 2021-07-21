@@ -252,6 +252,7 @@ class NeedleBoy():
 
         cv.imshow('canny', self.canny)
         cv.waitKey()
+        cv.destroyAllWindows()
 
         dilation_size = 6
         dilation_type = cv.MORPH_RECT
