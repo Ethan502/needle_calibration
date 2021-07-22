@@ -5,6 +5,7 @@ Find the needle point of the image
 
 import cv2 as cv
 import numpy as np
+from contouring import contour_maker
 
 class NeedleBoy():
     
@@ -246,27 +247,24 @@ class NeedleBoy():
             [numpy.ndarray]: [the needle mask]
         """
 
-        self.median_blur = cv.medianBlur(img_, 5)
-        self.gray = cv.cvtColor(self.median_blur, cv.COLOR_BGR2GRAY)
-        self.canny = cv.Canny(self.gray, 40, 300, apertureSize=3)
+        # self.median_blur = cv.medianBlur(img_, 5)
+        # self.gray = cv.cvtColor(self.median_blur, cv.COLOR_BGR2GRAY)
+        # self.canny = cv.Canny(self.gray, 40, 300, apertureSize=3)
 
-        cv.imshow('canny', self.canny)
-        cv.waitKey()
-        cv.destroyAllWindows()
 
-        dilation_size = 6
-        dilation_type = cv.MORPH_RECT
-        #kernel is 12x30 rectangle, longer in the y direction
-        kernel = cv.getStructuringElement(
-            dilation_type, (2 * dilation_size, 5 * dilation_size), 
-            (dilation_size, dilation_size))
-        self.closing = cv.morphologyEx(self.canny, cv.MORPH_CLOSE, kernel, iterations=2)
-        cv.imshow('closing', self.closing)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-        #blur closing to let img find the contours
-        cnt_blur = cv.medianBlur(self.closing, 9)
-        mask1, mask2 = self.area_bandpass_filter(cnt_blur)
+        # dilation_size = 6
+        # dilation_type = cv.MORPH_RECT
+        # kernel is 12x30 rectangle, longer in the y direction
+        # kernel = cv.getStructuringElement(
+        #     dilation_type, (2 * dilation_size, 5 * dilation_size), 
+        #     (dilation_size, dilation_size))
+        # self.closing = cv.morphologyEx(self.canny, cv.MORPH_CLOSE, kernel, iterations=2)
+        # cv.imshow('closing', self.closing)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+        # blur closing to let img find the contours
+        # cnt_blur = cv.medianBlur(self.closing, 9)
+        mask1, mask2 = contour_maker(img_)
         #extend_mask calls needle_extremes which assigns the leftmost point(center)
         newmask1 = self.extend_mask_right(mask1)
         newmask2 = self.extend_mask_left(mask2)
