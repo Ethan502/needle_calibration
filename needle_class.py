@@ -5,7 +5,8 @@ Find the needle point of the image
 
 import cv2 as cv
 import numpy as np
-from contouring import contour_maker
+
+from contourtest import contour_maker
 
 class NeedleBoy():
     
@@ -117,8 +118,8 @@ class NeedleBoy():
             self.bottommost1 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
-            cv.circle(self.img, self.leftmost1, 10, (0,0,255),1)
-            cv.circle(_img, self.leftmost1, 10, (0,0,255),1)
+            cv.circle(self.img, self.leftmost1, 3, (0,0,255),1)
+            cv.circle(_img, self.leftmost1, 3, (0,0,255),1)
 
             # cv.imshow('right contour', _img)
             # cv.waitKey(0)
@@ -142,8 +143,8 @@ class NeedleBoy():
             self.bottommost2 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost2 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
-            cv.circle(self.img, self.rightmost2, 10, (0,0,255),1)
-            cv.circle(_img, self.rightmost2, 10, (0,0,255),1)
+            cv.circle(self.img, self.rightmost2, 3, (0,0,255),1)
+            cv.circle(_img, self.rightmost2, 3, (0,0,255),1)
             
             cv.imshow('left contour', _img)
             cv.waitKey(0)
@@ -251,10 +252,12 @@ class NeedleBoy():
         # self.gray = cv.cvtColor(self.median_blur, cv.COLOR_BGR2GRAY)
         # self.canny = cv.Canny(self.gray, 40, 300, apertureSize=3)
 
+        # cv.imshow('canny', self.canny)
+        # cv.waitKey()
 
         # dilation_size = 6
         # dilation_type = cv.MORPH_RECT
-        # kernel is 12x30 rectangle, longer in the y direction
+        # #kernel is 12x30 rectangle, longer in the y direction
         # kernel = cv.getStructuringElement(
         #     dilation_type, (2 * dilation_size, 5 * dilation_size), 
         #     (dilation_size, dilation_size))
@@ -262,7 +265,7 @@ class NeedleBoy():
         # cv.imshow('closing', self.closing)
         # cv.waitKey(0)
         # cv.destroyAllWindows()
-        # blur closing to let img find the contours
+        # #blur closing to let img find the contours
         # cnt_blur = cv.medianBlur(self.closing, 9)
         mask1, mask2 = contour_maker(img_)
         #extend_mask calls needle_extremes which assigns the leftmost point(center)
