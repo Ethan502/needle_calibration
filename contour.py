@@ -41,8 +41,7 @@ def contour_maker(pic):
                 (dilation_size, dilation_size))
     closing = cv2.morphologyEx(canny, cv2.MORPH_CLOSE, kernel, iterations=2)
     frame1, frame2 = filter(closing)
-    cv2.imshow('canny',canny)
-    cv2.imshow('closing',closing)
+    
 
     return frame1, frame2
 

@@ -6,7 +6,7 @@ Find the needle point of the image
 import cv2 as cv
 import numpy as np
 
-from contourtest import contour_maker
+from contour import contour_maker
 
 class NeedleBoy():
     
