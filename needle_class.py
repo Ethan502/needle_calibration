@@ -119,7 +119,6 @@ class NeedleBoy():
             self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
             cv.circle(self.img, self.leftmost1, 3, (0,0,255),1)
-            cv.circle(_img, self.leftmost1, 3, (0,0,255),1)
 
             # cv.imshow('right contour', _img)
             # cv.waitKey(0)
@@ -144,11 +143,8 @@ class NeedleBoy():
             self.topmost2 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
             cv.circle(self.img, self.rightmost2, 3, (0,0,255),1)
-            cv.circle(_img, self.rightmost2, 3, (0,0,255),1)
             
-            cv.imshow('left contour', _img)
-            cv.waitKey(0)
-            cv.imshow('left contour', self.img)
+            cv.imshow('result', self.img)
             cv.waitKey(0)
             cv.destroyAllWindows()
 
@@ -186,6 +182,7 @@ class NeedleBoy():
                                         left_top_point, left_bottom_point)
         self.needle_vertices2 = region_of_interest_verticies
         newmask = self.region_of_interest(np.array([region_of_interest_verticies], np.int32))
+        
         
 
         return newmask
