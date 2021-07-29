@@ -17,10 +17,6 @@ def filter(img_):
     print(len(needle_contours))
     cv2.drawContours(frame1, needle_contours, 1, 255, cv2.FILLED)
     cv2.drawContours(frame2, needle_contours, 0, 255, cv2.FILLED)
-    cv2.imshow('frame1',frame1)
-    cv2.imshow('frame2', frame2)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
     return frame1, frame2
 
     
@@ -41,9 +37,6 @@ def contour_maker(pic):
                 (dilation_size, dilation_size))
     closing = cv2.morphologyEx(canny, cv2.MORPH_CLOSE, kernel, iterations=2)
     frame1, frame2 = filter(closing)
-    cv2.imshow('canny', canny)
-    cv2.waitKey()
-    cv2.destroyAllWindows()
 
     return frame1, frame2
 

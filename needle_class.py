@@ -15,6 +15,7 @@ class NeedleBoy():
         self.img = frame
         self.width = frame.shape[1]
         self.right_tip_point = [] #x,y coordinates of the farthest left point of the point of the RIGHT needle
+        self.left_tip_point = [] #x,y coordinates of the farthest right point of the LEFT needle
         self.leftmost1 = (0,0) #leftmost point of the right needle contour
         self.bottommost1 = (0,0) #bottom of the right needle contour
         self.topmost1 = (0,0) #top point of the right needle contour
@@ -119,12 +120,6 @@ class NeedleBoy():
             self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
             cv.circle(self.img, self.leftmost1, 3, (0,0,255),1)
-
-            # cv.imshow('right contour', _img)
-            # cv.waitKey(0)
-            # cv.imshow('right contour', self.img)
-            # cv.waitKey(0)
-            # cv.destroyAllWindows()
 
 
     def needle_extremes_left(self, _img):
@@ -281,3 +276,4 @@ class NeedleBoy():
         """
         self.mask1 , self.mask2 = self.needle_mask(self.img)
         self.right_tip_point = self.leftmost1
+        self.left_tip_point = self.rightmost2

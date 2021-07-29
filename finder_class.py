@@ -67,8 +67,9 @@ class CalibrationPoints:
         # needle class implementaion
         nf = NeedleBoy(self.img)
         nf.process()
-        self.needle_point = nf.point
-        needle_vertices = nf.needle_vertices
+        self.rightpoint = nf.right_tip_point
+        self.leftpoint = nf.left_tip_point
+        needle_vertices = nf.needle_vertices1
 
         # calibration circle implementation
         pt = PointFinder(self.img)
@@ -94,6 +95,14 @@ class CalibrationPoints:
         pt.max_area = 2800
         # execute the point class
         self.calib_point = pt.process()
+        cv.circle(self.img, self.rightpoint, 3, (0,0,255),2)
+        cv.circle(self.img, self.leftpoint, 3, (0,0,255),2)
+        cv.circle(self.img, self.calib_point, 3, (255,0,0),2)
+
+        cv.imshow('result', self.img)
+        cv.waitKey()
+        cv.destroyAllWindows()
+
         if self.calib_point == []:
             print('not found')
         if self.debug_flag is True:

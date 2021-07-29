@@ -62,6 +62,22 @@ class PointFinder:
             masked_image = cv.bitwise_and(img.copy(), mask)
         return masked_image
 
+    def area_bandpass_filter(self):
+        thresh_img = self.thresh_img
+        contours, _ = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        new_frame = np.zeros_like(thresh_img)
+        # loop over the contours, get rid of contours outside of the threshold
+        for i, contour in enumerate(contours):
+            c_area = cv.contourArea(contour)
+            if self.min_area <= c_area <= self.max_area:
+                self.c_area = c_area
+                mask = np.zeros_like(thresh_img)
+                cv.drawContours(mask, contour, i, 255, cv.FILLED)
+                mask = cv.bitwise_and(thresh_img.copy(), mask)
+                new_frame = cv.bitwise_or(new_frame, mask)
+        return new_frame
+
+
 
     # masks the needle
     def needle_filter(self, image):
@@ -69,6 +85,20 @@ class PointFinder:
         cropped_image = self.region_of_interest(image, np.array([self.needle_vertices], np.int32))
         self.flag_roi_in_out = 0
         return cropped_image
+
+    def find_point(self):
+        # find contours in the threshold area
+        contours, _ = cv.findContours(self.filtered_mask_img.copy(), 
+                                    cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        # approximate contours to polygons + get bounding rects and circles
+        contours_poly = [None] * len(contours)
+        centers = [None] * len(contours)
+        radius = [None] * len(contours)
+        for i, c in enumerate(contours):
+            contours_poly[i] = cv.approxPolyDP(c, 3, True)
+            centers[i], radius[i] = cv.minEnclosingCircle(contours_poly[i])
+        for i in range(len(contours)):
+            self.center = (int(centers[i][0]), int(centers[i][1]))
 
 
 
@@ -83,3 +113,8 @@ class PointFinder:
         self.cropped_img = self.region_of_interest(self.blurred_img, np.array([self.roi_vertices], np.int32))
         self.cropped_img = self.needle_filter(self.cropped_img)
         # make a mask to be able to find the dark spots on the frame
+        _, self.thresh_img = cv.threshold(self.cropped_img, self.thresh_l, self.thresh_u, cv.THRESH_BINARY_INV)
+        # filters contours using area(size) thresholds
+        self.filtered_mask_img = self.area_bandpass_filter()
+        self.find_point()
+        return self.center
