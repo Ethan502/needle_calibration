@@ -75,6 +75,9 @@ class PointFinder:
                 cv.drawContours(mask, contour, i, 255, cv.FILLED)
                 mask = cv.bitwise_and(thresh_img.copy(), mask)
                 new_frame = cv.bitwise_or(new_frame, mask)
+        cv.imshow('filtered image', new_frame)
+        cv.waitKey()
+        cv.destroyAllWindows()
         return new_frame
 
 
