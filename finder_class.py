@@ -5,6 +5,7 @@ import cv2 as cv
 from matplotlib import pyplot as plt
 from point_class import PointFinder
 from needle_class import NeedleBoy
+from circle_class import CircleBoy
 
 class CalibrationPoints:
     """finds the calibration point and the needle point
@@ -72,27 +73,27 @@ class CalibrationPoints:
         needle_vertices = nf.needle_vertices1
 
         # calibration circle implementation
-        pt = PointFinder(self.img)
+        pt = CircleBoy(self.img)
         # initialize some variables for PointFinder
         # get dimensions of img
         height = pt.img.shape[0]
         width = pt.img.shape[1]
         # this returns the inside of the vertices this one is a square over the image
         # x=0 is left of img and y=0 is top of image
-        pt.roi_vertices = [(width/16,0), (width/16, height * 15 / 16), 
-                            (width * 15 / 16, height * 15 / 16),
-                            (width * 15 / 16, 0)]
-        
-        pt.needle_vertices = needle_vertices
+            # pt.roi_vertices = [(width/16,0), (width/16, height * 15 / 16), 
+            #                     (width * 15 / 16, height * 15 / 16),
+            #                     (width * 15 / 16, 0)]
+            
+            # pt.needle_vertices = needle_vertices
         
 
         # init settings
         # lighting thresholds
-        pt.thresh_l = 65
-        pt.thresh_u = 250
+        # pt.thresh_l = 65
+        # pt.thresh_u = 250
         # contour area thresholds
-        pt.min_area = 1300
-        pt.max_area = 2800
+        # pt.min_area = 1300
+        # pt.max_area = 2800
         # execute the point class
         self.calib_point = pt.process()
         cv.circle(self.img, self.rightpoint, 3, (0,0,255),2)
