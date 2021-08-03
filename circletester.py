@@ -28,11 +28,8 @@ def center_point_finder(img):
         img ([nd.array]): [b/w mask of just the detected center point]
     """
 
-    i = cv.HoughCircles(img, cv.HOUGH_GRADIENT, 1,1, param1=50, param2=30, minRadius=0, maxRadius=0)
-    i = np.uint16(np.around(i))
-    print(i)
-    # i = np.uint16(i)
-    # cv.circle(img, (i[0],i[1]), i[2],(0,255,0),2)
+    contours = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    
     # cv.imshow('circle', img)
     # cv.waitKey()
     # cv.destroyAllWindows()
