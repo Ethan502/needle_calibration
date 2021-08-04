@@ -45,13 +45,13 @@ class CircleBoy:
             bottom = tuple(cnt[cnt[:,:,1].argmax()][0])
             right = tuple(cnt[cnt[:,:,0].argmax()][0])
 
-            top_x = top[0]
-            bottom_x = bottom[0]
-            left_y = left[1]
-            right_y = right[1]
+            top_y = top[1]
+            bottom_y = bottom[1]
+            left_x = left[0]
+            right_x = right[0]
 
-            center_x = (top_x + bottom_x)/2
-            center_y = (left_y + right_y)/2
+            center_x = ((right_x - left_x)/2) + left_x
+            center_y = ((bottom_y - top_y)/2) + top_y
             center_point = (round(center_x),round(center_y))
             self.point = center_point
 
@@ -65,7 +65,8 @@ class CircleBoy:
         gray = cv.cvtColor(foreground, cv.COLOR_BGR2GRAY)
         thresh = cv.threshold(gray, 1, 255, cv.THRESH_BINARY)[1]
         thresh = cv.morphologyEx(thresh, cv.MORPH_OPEN, cv.getStructuringElement(cv.MORPH_RECT, (5,5)))
-        filtered = self.area_bandpass_filter(thresh)
+        blur_mask = cv.medianBlur(thresh, 9)
+        filtered = self.area_bandpass_filter(blur_mask)
         self.center_point_finder(filtered)
         return self.point
 
