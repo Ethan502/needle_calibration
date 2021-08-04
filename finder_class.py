@@ -96,9 +96,9 @@ class CalibrationPoints:
         # pt.max_area = 2800
         # execute the point class
         self.calib_point = pt.process()
-        cv.circle(self.img, self.rightpoint, 3, (0,0,255),2)
-        cv.circle(self.img, self.leftpoint, 3, (0,0,255),2)
-        cv.circle(self.img, self.calib_point, 3, (255,0,0),2)
+        cv.circle(self.img, self.rightpoint, 1, (0,0,255),2)
+        cv.circle(self.img, self.leftpoint, 1, (0,0,255),2)
+        cv.circle(self.img, self.calib_point, 1, (255,0,0),2)
 
         cv.imshow('result', self.img)
         cv.waitKey()
