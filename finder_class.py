@@ -3,7 +3,6 @@
 import cv2 as cv
 
 from matplotlib import pyplot as plt
-from point_class import PointFinder
 from needle_class import NeedleBoy
 from circle_class import CircleBoy
 
@@ -20,6 +19,7 @@ class CalibrationPoints:
         self.needle_point = (0,0)
         self.calib_point = (0,0)
         self.debug_flag = False
+        self.needle_count = 0
 
     def open_subplot_window(self, titles_, images_, subx, suby):
         """plots the images you pass in. you need to specify what subx and suby will be
@@ -68,9 +68,9 @@ class CalibrationPoints:
         # needle class implementaion
         nf = NeedleBoy(self.img)
         nf.process()
+        self.needle_count = nf.needle_count
         self.rightpoint = nf.right_tip_point
         self.leftpoint = nf.left_tip_point
-        needle_vertices = nf.needle_vertices1
 
         # calibration circle implementation
         pt = CircleBoy(self.img)
@@ -78,27 +78,16 @@ class CalibrationPoints:
         # get dimensions of img
         height = pt.img.shape[0]
         width = pt.img.shape[1]
-        # this returns the inside of the vertices this one is a square over the image
-        # x=0 is left of img and y=0 is top of image
-            # pt.roi_vertices = [(width/16,0), (width/16, height * 15 / 16), 
-            #                     (width * 15 / 16, height * 15 / 16),
-            #                     (width * 15 / 16, 0)]
-            
-            # pt.needle_vertices = needle_vertices
-        
-
-        # init settings
-        # lighting thresholds
-        # pt.thresh_l = 65
-        # pt.thresh_u = 250
-        # contour area thresholds
-        # pt.min_area = 1300
-        # pt.max_area = 2800
-        # execute the point class
         self.calib_point = pt.process()
-        cv.circle(self.img, self.rightpoint, 1, (0,0,255),2)
-        cv.circle(self.img, self.leftpoint, 1, (0,0,255),2)
-        cv.circle(self.img, self.calib_point, 1, (255,0,0),2)
+
+        if self.needle_count == 1: 
+            cv.circle(self.img, self.rightpoint, 1, (0,0,255),2)
+            cv.circle(self.img, self.calib_point, 1, (255,0,0),2)
+        elif self.needle_count == 2:
+            cv.circle(self.img, self.rightpoint, 1, (0,0,255),2)
+            cv.circle(self.img, self.leftpoint, 1, (0,0,255),2)
+            cv.circle(self.img, self.calib_point, 1, (255,0,0),2)
+
 
         cv.imshow('result', self.img)
         cv.waitKey()

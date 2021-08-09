@@ -51,7 +51,7 @@ class NeedleBoy():
         print(f"The number of contours is: {self.needle_count}")
         # only draws and the contours for the number of contour areas detected
         if self.needle_count == 1:
-            cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
+            cv.drawContours(frame1, needle_contours, 0, 255, cv.FILLED)
         elif self.needle_count == 2:
             cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
             cv.drawContours(frame2, needle_contours, 0, 255, cv.FILLED)
@@ -80,7 +80,10 @@ class NeedleBoy():
         closing = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel, iterations=2)
         frame1, frame2 = self.filter(closing)
 
-        return frame1, frame2
+        if self.needle_count == 1:
+            return frame1, None
+        elif self.needle_count == 2:
+            return frame1, frame2
 
 
     def region_of_interest(self, vertices):
@@ -223,14 +226,7 @@ class NeedleBoy():
         return new_mask
        
     def needle_mask(self, img_):
-        """Needlemasking process:
-            -medianBlur kernel size 5
-            -grayscale
-            -canny lines to get needle outlines
-            -closing (dilation then erode) to fill the inside of the canny lines
-                -kernal is a 12x30 rectangle to fill inside of the needle outline
-                -medianBlur again to get rid of sharper edges
-                find bottommost point for extending the mask
+        """
         Args:
             img_ ([numpy.ndarray]): [image you want to grab]
 
@@ -242,7 +238,7 @@ class NeedleBoy():
         
         if self.needle_count == 1:
             newmask1 = self.extend_mask_right(mask1)
-            return newmask1
+            return newmask1, None
         elif self.needle_count == 2:
             newmask1 = self.extend_mask_right(mask1)
             newmask2 = self.extend_mask_left(mask2)
