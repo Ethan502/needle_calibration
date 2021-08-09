@@ -45,10 +45,13 @@ class CircleBoy:
             bottom = tuple(cnt[cnt[:,:,1].argmax()][0])
             right = tuple(cnt[cnt[:,:,0].argmax()][0])
 
-            top_y = top[1]
-            bottom_y = bottom[1]
-            left_x = left[0]
-            right_x = right[0]
+            top_x, top_y = top[0], top[1]
+            bottom_x, bottom_y = bottom[0], bottom[1]
+            left_x, left_y = left[0], left[1]
+            right_x, right_y = right[0], right[1]
+
+            # center_x = (top_x + bottom_x + left_x + right_x)/4
+            # center_y = (top_y + bottom_y + left_y + right_y)/4
 
             center_x = ((right_x - left_x)/2) + left_x
             center_y = ((bottom_y - top_y)/2) + top_y

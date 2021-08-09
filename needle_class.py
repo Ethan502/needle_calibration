@@ -32,6 +32,56 @@ class NeedleBoy():
         self.canny = []
         self.closing = []
         self.mask = []
+        # focused needle count
+        self.needle_count = 0
+
+    def filter(self,img_):
+        contours, _ = cv.findContours(img_.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+        needle_contours = []
+        frame1 = np.zeros_like(img_)
+        frame2 = np.zeros_like(img_)
+        # iterate over all the contours and filter out the area
+        for c in contours:
+            c_area = cv.contourArea(c)
+            # print(i) 
+            # print(c_area)
+            if 10000 <= c_area <= 400000:
+                needle_contours.append(c)
+        self.needle_count = len(needle_contours)
+        print(f"The number of contours is: {self.needle_count}")
+        # only draws and the contours for the number of contour areas detected
+        if self.needle_count == 1:
+            cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
+        elif self.needle_count == 2:
+            cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
+            cv.drawContours(frame2, needle_contours, 0, 255, cv.FILLED)
+        else:
+            print("ERROR: number of contours is: " + self.needle_count)
+        
+        if self.needle_count == 1:
+            return frame1, None
+        elif self.needle_count == 2:
+            return frame1, frame2
+
+
+    def contour_maker(self,pic): 
+        blur = cv.medianBlur(pic,5)
+        lab = cv.cvtColor(blur, cv.COLOR_BGR2LAB)
+        lab_planes = cv.split(lab)
+        clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        lab_planes[0] = clahe.apply(lab_planes[0])
+        lab = cv.merge(lab_planes)
+        canny = cv.Canny(lab, threshold1=40, threshold2=300, apertureSize=3)
+        dilation_size = 6
+        dilation_type = cv.MORPH_RECT
+        kernel = cv.getStructuringElement(
+                    dilation_type, (2 * dilation_size, 5 * dilation_size), 
+                    (dilation_size, dilation_size))
+        closing = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel, iterations=2)
+        frame1, frame2 = self.filter(closing)
+
+        return frame1, frame2
+
 
     def region_of_interest(self, vertices):
         """creates a mask on a grayscale img_ for vertices given
@@ -47,58 +97,6 @@ class NeedleBoy():
         match_mask_color = (255,255,255)
         masked_img = cv.fillPoly(mask, vertices, match_mask_color)
         return masked_img
-
-
-
-
-    def area_bandpass_filter(self, img_):
-        """filters the contours out of img_ if they're too small or too big
-
-        Args:
-            img_ (np.ndarray): [b/w img that has been thresholded]
-            min_area (int): [minimum acceptable area for the contours]
-            max_area (int): [maximum acceptable area for the contours]
-
-        Returns:
-            (np.ndarray): [b/w img with large and small contours removed]
-        """
-
-        contours, _ = cv.findContours(img_.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-        frame = np.zeros_like(img_)
-        needle_contours = []
-        
-        # iterate over all the contours and filter out the area
-        for i, c in enumerate(contours):
-            c_area = cv.contourArea(c)
-            # print(i) 
-            # print(c_area)
-            if self.min_area <= c_area <= self.max_area:
-                needle_contours.append(c)
-        frame1 = np.zeros_like(img_)
-        frame2 = np.zeros_like(img_)
-        cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
-        cv.drawContours(frame2, needle_contours, 0, 255, cv.FILLED)
-
-            # mask_one = cv.bitwise_and(img_.copy(), frame1)
-            # mask1 = cv.bitwise_or(new_frame, mask_one)
-
-            # mask_two = cv.bitwise_and(img.copy(), frame2)
-            # mask2 = cv.bitwise_or()
-        # cv.imshow('right needle', frame1)
-        # cv.imshow('left needle', frame2)
-        # cv.waitKey(0)
-        # cv.destroyAllWindows()
-
-
-
-
-
-        # if self.min_area <= c_area <= self.max_area:
-        #         mask = np.zeros_like(img_)
-        #         cv.drawContours(mask, contours, i, 255, cv.FILLED)
-        #         mask = cv.bitwise_and(img_.copy(), mask)
-        #         new_frame = cv.bitwise_or(new_frame, mask)
-        return frame1, frame2
 
     def needle_extremes_right(self, _img):
         """finds the left, bottom, and topmost points of the rightmost contour in grayscale
@@ -239,31 +237,16 @@ class NeedleBoy():
         Returns:
             [numpy.ndarray]: [the needle mask]
         """
-
-        # self.median_blur = cv.medianBlur(img_, 5)
-        # self.gray = cv.cvtColor(self.median_blur, cv.COLOR_BGR2GRAY)
-        # self.canny = cv.Canny(self.gray, 40, 300, apertureSize=3)
-
-        # cv.imshow('canny', self.canny)
-        # cv.waitKey()
-
-        # dilation_size = 6
-        # dilation_type = cv.MORPH_RECT
-        # #kernel is 12x30 rectangle, longer in the y direction
-        # kernel = cv.getStructuringElement(
-        #     dilation_type, (2 * dilation_size, 5 * dilation_size), 
-        #     (dilation_size, dilation_size))
-        # self.closing = cv.morphologyEx(self.canny, cv.MORPH_CLOSE, kernel, iterations=2)
-        # cv.imshow('closing', self.closing)
-        # cv.waitKey(0)
-        # cv.destroyAllWindows()
-        # #blur closing to let img find the contours
-        # cnt_blur = cv.medianBlur(self.closing, 9)
-        mask1, mask2 = contour_maker(img_)
-        #extend_mask calls needle_extremes which assigns the leftmost point(center)
-        newmask1 = self.extend_mask_right(mask1)
-        newmask2 = self.extend_mask_left(mask2)
-        return newmask1, newmask2
+        mask1, mask2 = self.contour_maker(img_)
+        #extend_mask calls needle_extremes which assigns the leftmost and rightmost points
+        
+        if self.needle_count == 1:
+            newmask1 = self.extend_mask_right(mask1)
+            return newmask1
+        elif self.needle_count == 2:
+            newmask1 = self.extend_mask_right(mask1)
+            newmask2 = self.extend_mask_left(mask2)
+            return newmask1, newmask2
         
         
 

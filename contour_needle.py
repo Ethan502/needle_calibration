@@ -1,47 +1,56 @@
-import cv2
+import cv2 as cv
 import numpy as np
 
 
 def filter(img_):
-    contours, _ = cv2.findContours(img_.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv.findContours(img_.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     needle_contours = []
     frame1 = np.zeros_like(img_)
     frame2 = np.zeros_like(img_)
     # iterate over all the contours and filter out the area
     for c in contours:
-        c_area = cv2.contourArea(c)
+        c_area = cv.contourArea(c)
         # print(i) 
         # print(c_area)
         if 10000 <= c_area <= 400000:
             needle_contours.append(c)
-    print(len(needle_contours))
-    cv2.drawContours(frame1, needle_contours, 1, 255, cv2.FILLED)
-    cv2.drawContours(frame2, needle_contours, 0, 255, cv2.FILLED)
-    return frame1, frame2
-
+    needle_count = len(needle_contours)
+    # only draws and the contours for the number of contour areas detected
+    if needle_count == 1:
+        cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
+    elif needle_count == 2:
+        cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
+        cv.drawContours(frame2, needle_contours, 0, 255, cv.FILLED)
+    else:
+        print("ERROR: number of contours is: " + needle_count)
+    
+    if needle_count == 1:
+        return frame1
+    elif needle_count == 2:
+        return frame1, frame2
     
 
 def contour_maker(pic): 
-    blur = cv2.medianBlur(pic,5)
-    gray = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
-    lab = cv2.cvtColor(blur, cv2.COLOR_BGR2LAB)
-    lab_planes = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    blur = cv.medianBlur(pic,5)
+    gray = cv.cvtColor(blur, cv.COLOR_BGR2GRAY)
+    lab = cv.cvtColor(blur, cv.COLOR_BGR2LAB)
+    lab_planes = cv.split(lab)
+    clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     lab_planes[0] = clahe.apply(lab_planes[0])
-    lab = cv2.merge(lab_planes)
-    canny = cv2.Canny(lab, threshold1=40, threshold2=300, apertureSize=3)
+    lab = cv.merge(lab_planes)
+    canny = cv.Canny(lab, threshold1=40, threshold2=300, apertureSize=3)
     dilation_size = 6
-    dilation_type = cv2.MORPH_RECT
-    kernel = cv2.getStructuringElement(
+    dilation_type = cv.MORPH_RECT
+    kernel = cv.getStructuringElement(
                 dilation_type, (2 * dilation_size, 5 * dilation_size), 
                 (dilation_size, dilation_size))
-    closing = cv2.morphologyEx(canny, cv2.MORPH_CLOSE, kernel, iterations=2)
+    closing = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel, iterations=2)
     frame1, frame2 = filter(closing)
 
     return frame1, frame2
 
 
-pic = cv2.imread('static/images/needle1.jpg')
+pic = cv.imread('static/images/needle1.jpg')
 contour_maker(pic)
   
     # cv2.imshow('gray', gray)
