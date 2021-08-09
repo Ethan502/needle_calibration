@@ -32,10 +32,6 @@ class CircleBoy:
             img ([nd.array]): [b/w mask of just the detected center point]
         """
 
-        cv.imshow('mask', img)
-        cv.waitKey()
-        cv.destroyAllWindows()
-
 
         contours, _ = cv.findContours(img.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         if len(contours) > 0:
