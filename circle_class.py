@@ -13,8 +13,6 @@ class CircleBoy:
         min_area = 1300
         max_area = 2500
         contours, _ = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
-        new_frame =  np.zeros_like(img)
-        print(len(contours))
         mask = np.zeros_like(img)
         for i, contour in enumerate(contours):
             c_area = cv.contourArea(contour)
@@ -22,7 +20,6 @@ class CircleBoy:
                 count+=1
                 cv.drawContours(mask, contours, i, 255, cv.FILLED)
                 mask = cv.bitwise_and(img.copy(), mask)
-        print(count)
         return mask
 
     def center_point_finder(self, img):

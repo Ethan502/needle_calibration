@@ -16,7 +16,8 @@ class CalibrationPoints:
     def __init__(self, frame):
         # Data members
         self.img = frame
-        self.needle_point = (0,0)
+        self.rightpoint = (0,0)
+        self.leftpoint = (0,0)
         self.calib_point = (0,0)
         self.debug_flag = False
         self.needle_count = 0

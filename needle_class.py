@@ -6,8 +6,6 @@ Find the needle point of the image
 import cv2 as cv
 import numpy as np
 
-from contour_needle import contour_maker
-
 class NeedleBoy():
     
     def __init__(self, frame):
@@ -113,9 +111,6 @@ class NeedleBoy():
 
         if len(contours) > 0:
             cnt = contours[-1]
-            print(cnt)
-            print(cnt.shape)
-            print(type(cnt))
             self.leftmost1 = tuple(cnt[cnt[:,:,0].argmin()][0])
             self.bottommost1 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
@@ -135,88 +130,7 @@ class NeedleBoy():
             self.rightmost2 = tuple(cnt[cnt[:,:,0].argmax()][0])
             self.bottommost2 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost2 = tuple(cnt[cnt[:,:,1].argmin()][0])
-
-
-    def extend_mask_left(self, mask):
-        """extends the mask of the left contour to the left edge of the image.
-        This is a modification from the original extend_mask_right. So if that one is jank, this one
-        is gonna be kinda messy. But itll work....hopefully
-         
-        Args:
-            mask ([numpy.ndarray]): [blurred b/w image of just the left contour]
-
-        Returns:
-            ([numpy.ndarray]): [b/w mask for the whole needle]
-        """
-
-        self.needle_extremes_left(mask)
-        x_1, y_1 = self.rightmost2
-        y_diff = self.rightmost2[1] - self.bottommost2[1]
-        x_2 = self.topmost2[0]
-        y_2 = self.topmost1[1] - 2 * y_diff #this is janky
-        slope = -(y_2 - y_1) / (x_2 - x_1)
-
-        right_mid_point = self.rightmost2
-        right_top_point = (self.rightmost2[0] + 5, self.rightmost2[1] + y_diff)
-        right_bottom_point = (self.rightmost2[0] + 5, self.bottommost2[1])
-        # b = y-mx
-        b_1 = right_top_point[1] - (slope * right_top_point[0])
-        b_2 = right_bottom_point[1] - (slope * right_bottom_point[0])
-        # y = mx+b
-        # slope bigger b/c of angle, janky as well
-        left_top_point = (self.width, int(1.5 * slope * self.width + b_1))
-        left_bottom_point = (self.width, int(slope * self.width + b_2))
-        # cut out the needle
-        region_of_interest_verticies = (right_bottom_point, right_mid_point, right_top_point,
-                                        left_top_point, left_bottom_point)
-        self.needle_vertices2 = region_of_interest_verticies
-        newmask = self.region_of_interest(np.array([region_of_interest_verticies], np.int32))
-        
-        
-
-        return newmask
-
-
-
-
-    def extend_mask_right(self, mask):
-        """extends the mask from the needle contour already found to the edge of the image.
-        This is set up for the needle coming in from the right side of the screen.
-        It do be janky. Can be set up later to detect the direction the needle is in, then extend that
-        to the edge.
-
-        Args:
-            mask (numpy.ndarray): [b/w image with only needle contour]
-
-        Returns:
-            (numpy.ndarray): [b/w mask for the whole needle]
-        """
-        
-        self.needle_extremes_right(mask)
-        x_1, y_1 = self.leftmost1
-        y_diff = self.leftmost1[1] - self.bottommost1[1]
-        x_2 = self.topmost1[0]
-        y_2 = self.topmost1[1] - 2 * y_diff # !JANK ALERT!
-        slope = -(y_2 - y_1) / (x_2 - x_1)
-
-        left_mid_point = self.leftmost1
-        left_top_point = (self.leftmost1[0] + 5, self.leftmost1[1] + y_diff)
-        left_bottom_point = (self.leftmost1[0] + 5, self.bottommost1[1])
-        # b = y-mx
-        b_1 = left_top_point[1] - (slope * left_top_point[0])
-        b_2 = left_bottom_point[1] - (slope * left_bottom_point[0])
-        # y = mx+b
-        # slope bigger b/c of angle, also is janky
-        right_top_point = (self.width, int(1.5 * slope * self.width + b_1))
-        right_bottom_point = (self.width, int(slope * self.width + b_2))
-        # cut out needle
-        region_of_interest_vertices = (left_bottom_point, left_mid_point, left_top_point,
-                                       right_top_point, right_bottom_point)
-        self.needle_vertices1 = region_of_interest_vertices
-        new_mask = self.region_of_interest(np.array([region_of_interest_vertices], np.int32))
-
-        
-        return new_mask
+           
        
     def needle_mask(self, img_):
         """
@@ -230,11 +144,11 @@ class NeedleBoy():
         #extend_mask calls needle_extremes which assigns the leftmost and rightmost points
         
         if self.needle_count == 1:
-            newmask1 = self.extend_mask_right(mask1)
+            newmask1 = self.needle_extremes_right(mask1)
             return newmask1, None
         elif self.needle_count == 2:
-            newmask1 = self.extend_mask_right(mask1)
-            newmask2 = self.extend_mask_left(mask2)
+            newmask1 = self.needle_extremes_right(mask1)
+            newmask2 = self.needle_extremes_left(mask2)
             return newmask1, newmask2
         
         
