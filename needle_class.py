@@ -120,8 +120,6 @@ class NeedleBoy():
             self.bottommost1 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost1 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
-            cv.circle(self.img, self.leftmost1, 3, (0,0,255),1)
-
 
     def needle_extremes_left(self, _img):
         """finds the right, bottom, and top most points for the leftmost contour of the image.
@@ -138,11 +136,6 @@ class NeedleBoy():
             self.bottommost2 = tuple(cnt[cnt[:,:,1].argmax()][0])
             self.topmost2 = tuple(cnt[cnt[:,:,1].argmin()][0])
 
-            cv.circle(self.img, self.rightmost2, 3, (0,0,255),1)
-            
-            cv.imshow('result', self.img)
-            cv.waitKey(0)
-            cv.destroyAllWindows()
 
     def extend_mask_left(self, mask):
         """extends the mask of the left contour to the left edge of the image.
