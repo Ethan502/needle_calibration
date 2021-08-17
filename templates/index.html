@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Computer Vision</title>
+</head>
+<body>
+    <p class="text-center" style="font-size: 30px;"><b>Object Detection</b></p>
+    <form action="#" method = "POST">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Original Image</th>
+                        <th>Processed Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="{{final_og_pic}}" alt = "Original Image"></img></td>
+                        <td><img src="{{final_new_pic}}" alt = "Processed Image"></img></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Choose a picture to analyze:</label>
+                            <select name="file1">
+                                {% if filelist %}
+                                {% for i in range(0, len) %}
+                                <option value="{{filelist[i]}}">{{filelist[i]}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn btn=primary" type="submit" name="submit1">Send</button></td>
+                        <td><button class="btn btn=primary" type="submit" name="submit2">Continue</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
