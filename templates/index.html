@@ -3,10 +3,11 @@
 <head>
     <meta charset="utf-8">
     <title>Computer Vision</title>
+    <link rel="stylesheet" type="text/css" href="static/stylesheets/style.css">
 </head>
 <body>
     <p class="text-center" style="font-size: 30px;"><b>Object Detection</b></p>
-    <form action="#" method = "POST">
+    <form method = "POST">
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -17,13 +18,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><img src="{{final_og_pic}}" alt = "Original Image"></img></td>
-                        <td><img src="{{final_new_pic}}" alt = "Processed Image"></img></td>
+                        <td><img src="{{final_og_pic}}" alt = "Original Image" width="500" height="500"></img></td>
+                        <td><img src="{{final_new_pic}}" alt = "Processed Image" width="500" height="500"></img></td>
                     </tr>
                     <tr>
                         <td>
                             <label>Choose a picture to analyze:</label>
-                            <select name="file1">
+                            <br>
+                            <select class="dropdown" name="file1">
                                 {% if filelist %}
                                 {% for i in range(0, len) %}
                                 <option value="{{filelist[i]}}">{{filelist[i]}}</option>

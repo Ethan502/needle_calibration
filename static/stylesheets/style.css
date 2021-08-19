@@ -1,0 +1,20 @@
+p{
+    color: black;
+    font-family: sans-serif;
+    text-align: center;
+    
+}
+
+tr{
+    color: gray;
+    text-align: center;
+    width:600px;
+}
+
+.table{
+    background-color: skyblue;
+}
+
+.dropdown{
+    text-align:center;
+}
