@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-pic = cv.imread('static/images/needle1.jpg')
+pic = cv.imread('static/images/needle2.jpg')
 lower_range = np.array([0,0,0])
 upper_range = np.array([85,85,85])
 
@@ -14,8 +14,7 @@ for i, c in enumerate(contours):
     if 1100 <= area <= 2000:
         cv.drawContours(backdrop, contours, i, [255,255,255], cv.FILLED)
 
-compare = np.zeros_like(mask)
-new_mask = cv.bitwise_and(backdrop, mask)
+
 
 contours, _ = cv.findContours(backdrop, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 if len(contours) > 0:
