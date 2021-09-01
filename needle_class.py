@@ -60,7 +60,7 @@ class NeedleBoy():
             cv.drawContours(frame1, needle_contours, 1, 255, cv.FILLED)
             cv.drawContours(frame2, needle_contours, 0, 255, cv.FILLED)
         else:
-            print("ERROR: number of contours is: " + self.needle_count)
+            print(f"ERROR: number of contours is: {self.needle_count}")
         
         if self.needle_count == 1:
             return frame1, None

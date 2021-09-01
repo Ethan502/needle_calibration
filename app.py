@@ -22,7 +22,6 @@ def home():
     if request.method == 'POST':
         original_image = os.path.join(app.config["IMAGE_FOLDER"], request.form["file1"])
         img_data = cv.imread(original_image)
-        print(type(img_data))
 
         points = CalibrationPoints(img_data)
         points.process()
