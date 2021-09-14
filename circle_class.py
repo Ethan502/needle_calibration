@@ -7,6 +7,7 @@ class CircleBoy:
         self.img = pic
         self.point = (0,0)
 
+    # if the contour finders will not get the circle, the color one comes in as backup. Finds the circle from its unique color
     def color_filter(self, img):
         lower_range = np.array([0,0,0])
         upper_range = np.array([85,85,85])
@@ -85,7 +86,7 @@ class CircleBoy:
             self.point = center_point
 
 
-
+    # the actual 'main' process of the circle finder
     def process(self):
         lighter_img = np.maximum(self.img.copy(), 10) # gets rid of any black pixels
         foreground = lighter_img.copy()
@@ -100,4 +101,3 @@ class CircleBoy:
         if self.point == (0,0):
            self.point = self.color_filter(self.img.copy())
         return self.point
-
