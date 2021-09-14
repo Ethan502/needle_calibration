@@ -90,9 +90,9 @@ class CalibrationPoints:
             cv.circle(self.img, self.calib_point, 1, (255,0,0),2)
 
 
-        # cv.imshow('result', self.img)
-        # cv.waitKey()
-        # cv.destroyAllWindows()
+        cv.imshow('result', self.img)
+        cv.waitKey()
+        cv.destroyAllWindows()
 
         if self.calib_point == []:
             print('not found')
