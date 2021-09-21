@@ -39,3 +39,38 @@ class Motor:
     def get_acceleration(self):
         return self.axis_settings.get("accel", unit = Units.ACCELERATION_MILLIMETRES_PER_SECOND_SQUARED)
         
+    def get_script_status(self):
+        return self.scriptRecieved
+    
+    def get_gear(self):
+        return self.gear + 1
+
+    def get_gearbox(self):
+        return self.gearbox
+
+    def get_base_speed(self):
+        return self.base_speed
+
+    def get_max_speed(self):
+        return self.max_speed
+
+    #checks if the motor has been homed
+    def is_homed(self):
+        return self.homed
+
+    #SETTERS -----------------------------------------------------------------------
+    def set_default_speed(self, speed):
+        self.axis_settings.set("maxspeed", speed, unit = Units.VELOCITY_MILLIMETRES_PER_SECOND)
+
+    def set_base_speed(self):
+        self.base_speed = self.max_speed / self.gearbox[MAX_GEAR]
+
+    def set_acceleration(self, accel):
+        self.axis_settings.set("accel", accel, unit = Units.VELOCITY_MILLIMETRES_PER_SECOND)
+
+    def set_gearbox(self, gear_list):
+        self.gearbox = gear_list
+        self.set_base_speed() #this needs to be reset, since the base speed depends on the gearbox config
+
+    def reset_gear(self):
+        self.gear = MIN_GEAR

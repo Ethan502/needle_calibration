@@ -90,11 +90,6 @@ class NeedleBoy():
         closing = cv.morphologyEx(canny, cv.MORPH_CLOSE, kernel, iterations=2)
         frame1, frame2 = self.filter(closing)
 
-        cv.imshow('lab2', closing)
-        
-
-        cv.waitKey()
-        cv.destroyAllWindows()
 
 
         if self.needle_count == 1:
