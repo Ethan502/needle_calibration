@@ -3,13 +3,14 @@ from zaber_motion.ascii import Connection
 from zaber_motion import Units
 from zaber_motion.ascii import Axis
 from zaber_motion.ascii import AxisSettings
+import time
 
 MIN_GEAR = 0
 MAX_GEAR = 2
 GEARBOX = [0.2,1,4]
 
 class Motor:
-    #Constructor--------------------------------------------------------------------
+    # Constructor--------------------------------------------------------------------
     def __init__(self, device, max_speed, tray_length):
         self.homed = False # Boolean data member, allows for checking if device is homed at runtime
         self.script = [] # List of Move objects for automated execution
@@ -26,7 +27,7 @@ class Motor:
         self.set_default_speed(self.max_speed)
         self.set_base_speed()
 
-    #Getters-----------------------------------------------------------------------
+    # Getters-----------------------------------------------------------------------
     def get_id(self):
         return self.axis.identity.peripheral_id
 
@@ -54,11 +55,11 @@ class Motor:
     def get_max_speed(self):
         return self.max_speed
 
-    #checks if the motor has been homed
+    # Checks if the motor has been homed
     def is_homed(self):
         return self.homed
 
-    #SETTERS -----------------------------------------------------------------------
+    # SETTERS -----------------------------------------------------------------------
     def set_default_speed(self, speed):
         self.axis_settings.set("maxspeed", speed, unit = Units.VELOCITY_MILLIMETRES_PER_SECOND)
 
@@ -74,3 +75,47 @@ class Motor:
 
     def reset_gear(self):
         self.gear = MIN_GEAR
+
+    # Gear Functions -----------------------------------------------------------------
+    def shift_gear_up(self):
+        if (self.gear < MAX_GEAR):
+            self.gear = self.gear + 1
+            return True
+        else:
+            return False
+
+    def shift_gear_down(self):
+        if (self.gear > MIN_GEAR):
+            self.gear = self.gear - 1
+            return True
+        else:
+            return False
+
+    # Moves --------------------------------------------------------------------------
+    # Moves the stage to the 0 position and defines it as the reference point for future displacements
+    def home(self):
+        self.set_default_speed(self.max_speed)
+        self.axis.home()
+        self.homed = True
+
+    # Performs an absolute displacement to the given position
+    def move_to(self, position):
+        self.axis.move_absolute(position, unit = Units.LENGTH_MILLIMETRES, wait_until_idle = True)
+
+    # Performs a relative displacement with the provided of default (1mm) step value
+    def move_step(self, step = 1):
+        negative_step = step < 0
+        c1 = ( (self.get_position() - abs(step) ) >= 0)
+        c2 = ( (self.get_position() + abs(step)) <= self.tray_length)
+
+        if ( (negative_step and c1) or (not(negative_step) and c2) ):
+            self.axis.move_relative(step, unit = Units.LENGTH_MILLIMETRES, wait_until_idle = True)
+        else:
+            print("Step too big, if performed motor will go beyond boundary. Cannot perform step.")
+    
+    # Performs an indefinite displacement at a given speed (providing a trigger [0-1] measurement)
+    def move_speed(self, trigger):
+        speed = self.base_speed * self.gearbox[self.gear] * trigger
+        self.axis.move_velocity(speed, unit = Units.VELOCITY_MILLIMETRES_PER_SECOND)
+
+    
