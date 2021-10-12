@@ -118,4 +118,61 @@ class Motor:
         speed = self.base_speed * self.gearbox[self.gear] * trigger
         self.axis.move_velocity(speed, unit = Units.VELOCITY_MILLIMETRES_PER_SECOND)
 
-    
+    # This is the digital equivalent to pressing the button on the motor
+    # Erases the reference point, so the device will need to be homed again
+    def stop(self):
+        self.axis.stop(wait_until_idle = True)
+        self.homed = False
+
+        """
+        This section is only for testing motors individually. The motorseries class will be running
+        the master script that will run motors normally. 
+        """
+
+    # Recieves a script as a list of Move objects
+    def load_script(self, script):
+        self.script = script
+        self.scriptRecieved = True
+
+    def print_script(self):
+        for command in range(len(self.script)):
+            print(self.script[command].to_string())
+
+    # Runs a sequence of commands specified in a list of Move objects
+    # Returns a boolean signifying if the motor has a script to run or not
+    # CATCH: scripts can only be run once, then they need to be reloaded
+    def run_script(self):
+        if(self.scriptRecieved):
+            for command in self.script:
+                self.set_speed(command.speed)
+                self.move_to(command.position)
+            self.scriptReceived = False #reset the script boolean (script only runs once)
+            return True # Returns true to signify that the Motor has a loaded script and just run it
+                        # Whoever calls this function can then print a status message with the same name
+        else:
+            return False # Returns False to signify that the Motor doesn't have a loaded script
+
+    def testing():
+        # Open serial communications through the COM port
+        Library.enable_device_db_store()
+        com_port = "COM11"
+        connection = Connection.open_serial_port(com_port)
+        print("{} port successfully opened".format(com_port))
+        device_list = connection.detect_devices()
+        device = device_list[0]
+        # Initialize a motor
+        myMotor1 = Motor(device)
+        myMotor1.home()
+        print("myMotor1 is homed: ", myMotor1.is_homed())
+        myMotor1.move_to(10)
+
+        print("Starting move_speed() test")
+        for i in range(5):
+            myMotor1.move_speed(5*i)
+            time.sleep(.5)
+        for i in range(5):
+            myMotor1.move_speed(5*-i)
+            time.sleep(.5)
+
+    if __name__ == "__main__":
+        testing()
